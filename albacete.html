@@ -1,0 +1,309 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Albacete Balompié 26/27</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: banda de marcador arriba, luego dos columnas (partidos | clasificación) que se apilan en móvil */
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --ink: #1b1e25;
+  --muted: #5d6472;
+  --line: #dde1e8;
+  --accent: #b07a12;        /* corteza de queso manchego */
+  --accent-soft: #f6ecd6;
+  --win: #1f7a4d; --draw: #8a7a2e; --loss: #b23a3a;
+  --up: #e3f1e9; --po: #e6eef8; --down: #f8e5e5;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #13151a; --surface: #1c1f26; --ink: #eceef2; --muted: #9aa1ae; --line: #2e333d;
+  --accent: #e0aa45; --accent-soft: #3a2f1a;
+  --win: #4cc28a; --draw: #cdb85a; --loss: #ec7a7a;
+  --up: #1b3328; --po: #1c2a3d; --down: #3a2022; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #13151a; --surface: #1c1f26; --ink: #eceef2; --muted: #9aa1ae; --line: #2e333d;
+  --accent: #e0aa45; --accent-soft: #3a2f1a;
+  --win: #4cc28a; --draw: #cdb85a; --loss: #ec7a7a;
+  --up: #1b3328; --po: #1c2a3d; --down: #3a2022; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px 32px;
+  padding-bottom: 20px; border-bottom: 3px solid var(--ink); }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(38px, 7vw, 64px); line-height: .95; margin: 6px 0 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 span { color: var(--accent); }
+.status { display: flex; gap: 22px; flex-wrap: wrap; }
+.stat { display: grid; gap: 2px; }
+.stat b { font-family: var(--display); font-size: 34px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat small { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.stat.alert b { color: var(--loss); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 36px; margin-top: 28px; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+section { min-width: 0; display: grid; gap: 14px; align-content: start; }
+section + section { margin-top: 0; }
+.col { display: grid; gap: 36px; align-content: start; min-width: 0; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 0; letter-spacing: .01em; text-transform: uppercase; }
+.sub { color: var(--muted); font-size: 13.5px; margin: -8px 0 0; max-width: 62ch; }
+
+/* Lista de partidos */
+.matches { display: grid; border-top: 1px solid var(--line); }
+.m { display: grid; grid-template-columns: 74px minmax(0, 1fr) auto; align-items: center; gap: 12px;
+  padding: 10px 2px; border-bottom: 1px solid var(--line); }
+.m .when { font-family: var(--mono); font-size: 12px; color: var(--muted); line-height: 1.3; }
+.m .teams { min-width: 0; font-weight: 600; }
+.m .teams .vs { color: var(--muted); font-weight: 400; }
+.m .teams .alb { color: var(--ink); }
+.m .teams .opp { font-weight: 400; }
+.m .meta { font-size: 12px; color: var(--muted); font-weight: 400; display: block; }
+.score { font-family: var(--display); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 8px; }
+.chip { font-family: var(--mono); font-size: 11px; font-weight: 500; width: 22px; height: 22px; display: inline-grid; place-items: center; border-radius: 4px; color: #fff; }
+.chip.V { background: var(--win); } .chip.E { background: var(--draw); } .chip.D { background: var(--loss); }
+.form { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* Pronósticos */
+.pred { display: grid; gap: 10px; }
+.p { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: grid; gap: 8px; }
+.p .top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.p .t { font-weight: 600; }
+.p .t .meta { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 6px; }
+.p .guess { font-family: var(--display); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.p .guess small { font-family: var(--body); font-size: 12px; color: var(--muted); font-weight: 400; margin-right: 6px; }
+.bar { display: flex; height: 22px; border-radius: 4px; overflow: hidden; font-family: var(--mono); font-size: 11px; }
+.bar div { display: grid; place-items: center; color: #fff; min-width: 0; white-space: nowrap; overflow: hidden; }
+.bar .w { background: var(--win); } .bar .d { background: var(--draw); } .bar .l { background: var(--loss); }
+.legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.xg { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.proj { background: var(--accent-soft); border-radius: 6px; padding: 12px 14px; font-size: 14px; }
+.proj b { font-variant-numeric: tabular-nums; }
+
+/* Clasificación */
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
+th, td { padding: 7px 8px; text-align: right; white-space: nowrap; }
+th { font-family: var(--mono); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--line); }
+td.team, th.team { text-align: left; }
+td.pos { font-family: var(--mono); font-size: 12px; text-align: center; width: 30px; }
+tbody tr { border-bottom: 1px solid var(--line); }
+tbody tr:last-child { border-bottom: 0; }
+tr.z-up td.pos { background: var(--up); } tr.z-po td.pos { background: var(--po); } tr.z-down td.pos { background: var(--down); }
+tr.me { background: var(--accent-soft); font-weight: 700; }
+td.pts { font-weight: 700; }
+.zones { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.zones i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; border: 1px solid var(--line); }
+
+footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); display: grid; gap: 6px; }
+footer a { color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">LaLiga Hypermotion · Temporada 2026/27 · tras la jornada 10</div>
+      <h1>Albacete <span>Balompié</span></h1>
+    </div>
+    <div class="status" id="status"></div>
+  </header>
+
+  <div class="grid">
+    <div class="col">
+      <section>
+        <h2>Próximos partidos y pronóstico</h2>
+        <p class="sub">Modelo de Poisson: fuerza de ataque y defensa de cada equipo según sus goles en liga (ajustados hacia la media porque solo van 10 jornadas) y un plus por jugar en casa.</p>
+        <div class="legend"><span><i style="background:var(--win)"></i>Gana Albacete</span><span><i style="background:var(--draw)"></i>Empate</span><span><i style="background:var(--loss)"></i>Gana el rival</span></div>
+        <div class="pred" id="pred"></div>
+        <div class="proj" id="proj"></div>
+      </section>
+
+      <section>
+        <h2>Calendario</h2>
+        <div class="matches" id="upcoming"></div>
+      </section>
+
+      <section>
+        <h2>Resultados</h2>
+        <div class="matches" id="results"></div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section>
+        <h2>Clasificación</h2>
+        <div class="zones">
+          <span><i style="background:var(--up)"></i>Ascenso directo</span>
+          <span><i style="background:var(--po)"></i>Play-off</span>
+          <span><i style="background:var(--down)"></i>Descenso</span>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>#</th><th class="team">Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+            <tbody id="table"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <div>Datos actualizados a 20 de octubre de 2026. Fuentes: <a href="https://www.aragonplay.es/aragondeporte/resultados/futbol/segunda-division" target="_blank" rel="noopener">Aragón Deporte</a> (clasificación) y <a href="https://www.siguetuliga.com/equipo/albacete-balompie" target="_blank" rel="noopener">SigueTuLiga</a> (resultados y calendario). Los horarios sin hora aún no los ha fijado LaLiga.</div>
+    <div>Los pronósticos son una estimación estadística, no una predicción segura.</div>
+  </footer>
+</div>
+
+<script>
+const ME = "Albacete";
+
+// Clasificación tras la jornada 10: [equipo, PJ, G, E, P, GF, GC, Pts]
+const TABLE = [
+  ["Almería",10,8,0,2,20,7,24],["Castellón",10,7,2,1,18,4,23],["Eibar",10,7,1,2,20,11,22],
+  ["Sporting",10,6,1,3,11,9,19],["Girona",10,5,3,2,17,9,18],["Mallorca",10,5,3,2,12,5,18],
+  ["Granada",10,5,2,3,16,13,17],["Oviedo",10,5,2,3,13,10,17],["Burgos",10,5,2,3,13,10,17],
+  ["Sabadell",10,4,4,2,10,8,16],["Eldense",10,4,2,4,13,13,14],["Tenerife",10,3,4,3,12,14,13],
+  ["Valladolid",10,3,3,4,15,14,12],["Celta Fortuna",10,3,3,4,15,16,12],["Córdoba",10,4,0,6,15,20,12],
+  ["Las Palmas",10,3,2,5,13,19,11],["Leganés",10,3,2,5,6,15,11],["Andorra",10,3,1,6,13,17,10],
+  ["Real Sociedad B",10,2,2,6,14,21,8],["Cádiz",10,1,4,5,11,13,7],["Ceuta",10,1,2,7,9,22,5],
+  ["Albacete",10,0,1,9,6,22,1],
+];
+
+// Resultados: [jornada, fecha, local, visitante, goles local, goles visitante]
+const RESULTS = [
+  [1,"2026-08-16","Las Palmas","Albacete",2,1],
+  [2,"2026-08-22","Albacete","Real Sociedad B",1,2],
+  [3,"2026-08-29","Albacete","Oviedo",0,1],
+  [4,"2026-09-06","Castellón","Albacete",2,0],
+  [5,"2026-09-12","Granada","Albacete",1,1],
+  [6,"2026-09-18","Albacete","Córdoba",1,2],
+  [7,"2026-09-25","Girona","Albacete",2,0],
+  [8,"2026-10-03","Albacete","Eibar",1,3],
+  [9,"2026-10-12","Valladolid","Albacete",5,0],
+  [10,"2026-10-17","Sporting","Albacete",2,1],
+];
+
+// Calendario: [competición/jornada, fecha, hora|null, local, visitante]
+const UPCOMING = [
+  ["J11","2026-10-25","16:15","Albacete","Eldense"],
+  ["Copa","2026-10-28","20:00","Calvo Sotelo","Albacete"],
+  ["J12","2026-10-31","21:00","Albacete","Sabadell"],
+  ["J13","2026-11-07","18:30","Leganés","Albacete"],
+  ["J14","2026-11-16","20:30","Albacete","Celta Fortuna"],
+  ["J15","2026-11-20",null,"Burgos","Albacete"],
+  ["J16","2026-11-27",null,"Albacete","Tenerife"],
+  ["J17","2026-12-04",null,"Ceuta","Albacete"],
+  ["J18","2026-12-11",null,"Almería","Albacete"],
+  ["J19","2026-12-18",null,"Albacete","Mallorca"],
+  ["J20","2027-01-03",null,"Cádiz","Albacete"],
+];
+
+const fmt = d => new Date(d + "T12:00:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
+const el = (id) => document.getElementById(id);
+
+// ---------- Cabecera ----------
+const meIdx = TABLE.findIndex(r => r[0] === ME);
+const me = TABLE[meIdx];
+const safe = TABLE[17][7]; // puntos del 18º (primera plaza fuera del descenso)
+const form = RESULTS.slice(-5).map(r => {
+  const home = r[2] === ME, gf = home ? r[4] : r[5], ga = home ? r[5] : r[4];
+  return gf > ga ? "V" : gf === ga ? "E" : "D";
+});
+el("status").innerHTML = `
+  <div class="stat alert"><b>${meIdx + 1}º</b><small>Posición</small></div>
+  <div class="stat"><b>${me[7]}</b><small>Puntos</small></div>
+  <div class="stat"><b>${me[5]}–${me[6]}</b><small>Goles</small></div>
+  <div class="stat"><b>${safe - me[7]}</b><small>Pts a la salvación</small></div>
+  <div class="stat"><div class="form" style="height:34px;align-items:center">${form.map(f => `<span class="chip ${f}">${f}</span>`).join("")}</div><small>Últimos 5</small></div>`;
+
+// ---------- Resultados ----------
+el("results").innerHTML = RESULTS.slice().reverse().map(r => {
+  const [j, d, h, a, gh, ga] = r;
+  const home = h === ME, gf = home ? gh : ga, gc = home ? ga : gh;
+  const res = gf > gc ? "V" : gf === gc ? "E" : "D";
+  return `<div class="m">
+    <div class="when">${fmt(d)}<br>J${j}</div>
+    <div class="teams">${team(h)} <span class="vs">–</span> ${team(a)}<span class="meta">${home ? "Carlos Belmonte" : "Fuera"}</span></div>
+    <div class="score">${gh}–${ga}<span class="chip ${res}">${res}</span></div>
+  </div>`;
+}).join("");
+
+function team(n) { return n === ME ? `<span class="alb">${n}</span>` : `<span class="opp">${n}</span>`; }
+
+// ---------- Calendario ----------
+el("upcoming").innerHTML = UPCOMING.map(([c, d, t, h, a]) => `<div class="m">
+    <div class="when">${fmt(d)}<br>${t ?? "Hora por fijar"}</div>
+    <div class="teams">${team(h)} <span class="vs">–</span> ${team(a)}<span class="meta">${c === "Copa" ? "Copa del Rey · 1ª ronda" : "Liga · Jornada " + c.slice(1)}${h === ME ? " · Carlos Belmonte" : ""}</span></div>
+    <div class="score" style="font-size:14px;font-family:var(--mono);color:var(--muted)">${c}</div>
+  </div>`).join("");
+
+// ---------- Modelo de pronóstico ----------
+const N = TABLE.length;
+const totalGF = TABLE.reduce((s, r) => s + r[5], 0);
+const totalPJ = TABLE.reduce((s, r) => s + r[1], 0);
+const avg = totalGF / totalPJ;           // goles por equipo y partido
+const PRIOR = 5;                          // partidos "ficticios" a la media para suavizar
+const HOME = 1.12, AWAY = 0.89;           // ventaja de local típica en Segunda
+const stats = {};
+TABLE.forEach(r => {
+  const att = (r[5] + PRIOR * avg) / ((r[1] + PRIOR) * avg);
+  const def = (r[6] + PRIOR * avg) / ((r[1] + PRIOR) * avg);
+  stats[r[0]] = { att, def };
+});
+const pois = (k, l) => { let f = 1; for (let i = 2; i <= k; i++) f *= i; return Math.exp(-l) * l ** k / f; };
+
+function predict(h, a) {
+  const lh = avg * stats[h].att * stats[a].def * HOME;
+  const la = avg * stats[a].att * stats[h].def * AWAY;
+  let ph = 0, pd = 0, pa = 0, best = [0, 0, 0];
+  for (let i = 0; i <= 8; i++) for (let j = 0; j <= 8; j++) {
+    const p = pois(i, lh) * pois(j, la);
+    if (i > j) ph += p; else if (i === j) pd += p; else pa += p;
+    if (p > best[2]) best = [i, j, p];
+  }
+  const s = ph + pd + pa;
+  return { lh, la, ph: ph / s, pd: pd / s, pa: pa / s, best };
+}
+
+const league = UPCOMING.filter(u => u[0] !== "Copa").slice(0, 6);
+let expPts = 0;
+el("pred").innerHTML = league.map(([c, d, t, h, a]) => {
+  const r = predict(h, a);
+  const home = h === ME;
+  const w = home ? r.ph : r.pa, l = home ? r.pa : r.ph, dr = r.pd;
+  expPts += 3 * w + dr;
+  const opp = home ? a : h;
+  const oppPos = TABLE.findIndex(x => x[0] === opp) + 1;
+  const pct = x => Math.round(x * 100);
+  return `<div class="p">
+    <div class="top">
+      <div class="t">${home ? `Albacete – ${opp}` : `${opp} – Albacete`}<span class="meta">${c} · ${fmt(d)} · rival ${oppPos}º</span></div>
+      <div class="guess"><small>Marcador más probable</small>${r.best[0]}–${r.best[1]}</div>
+    </div>
+    <div class="bar" role="img" aria-label="Victoria ${pct(w)}%, empate ${pct(dr)}%, derrota ${pct(l)}%">
+      <div class="w" style="width:${w * 100}%">${pct(w)}%</div>
+      <div class="d" style="width:${dr * 100}%">${pct(dr)}%</div>
+      <div class="l" style="width:${l * 100}%">${pct(l)}%</div>
+    </div>
+    <div class="xg">Goles esperados: ${h} ${r.lh.toFixed(2)} · ${a} ${r.la.toFixed(2)}</div>
+  </div>`;
+}).join("");
+el("proj").innerHTML = `En estos 6 partidos el modelo espera unos <b>${expPts.toFixed(1)} puntos</b> para el Albacete, lo que le dejaría en torno a <b>${(me[7] + expPts).toFixed(0)}</b> tras la jornada 16. La permanencia hoy está en ${safe} puntos.`;
+
+// ---------- Clasificación ----------
+el("table").innerHTML = TABLE.map((r, i) => {
+  const pos = i + 1;
+  const zone = pos <= 2 ? "z-up" : pos <= 6 ? "z-po" : pos >= 19 ? "z-down" : "";
+  const dg = r[5] - r[6];
+  return `<tr class="${zone} ${r[0] === ME ? "me" : ""}">
+    <td class="pos">${pos}</td><td class="team">${r[0]}</td>
+    <td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td>
+    <td>${r[5]}</td><td>${r[6]}</td><td>${dg > 0 ? "+" + dg : dg}</td><td class="pts">${r[7]}</td></tr>`;
+}).join("");
+</script>
